@@ -12,15 +12,24 @@ namespace ConsoleApp
 
         private static void Main(string[] args)
         {
+            /*var samuraiRemik = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%San")).ToList();
+            foreach (var samurai in samuraiRemik)
+            {
+                Console.WriteLine(samurai.Name);
+            }*/
             //InsertVariousTypes();
             //InsertMultipleSamurais();
             //AddSamurai();
             //GetSamurais("After Add:");
             //GetSamuraisUsingLINQMethods();
             //QueryFilters();
-            RetrieveAndUpdateSamurai();
+            //RetrieveAndUpdateMultipleSamurais();
+            //RemoveSamurai();
+            //InsertBattle();
+            //QueryAndUpdateBattle_Disconnected();
             Console.Write("Press any key...");
             Console.ReadKey();
+
         }
 
         private static void InsertMultipleSamurais()
@@ -35,7 +44,6 @@ namespace ConsoleApp
             _context.Samurais.AddRange(samurai, samurai2, samurai3, samurai4, samurai5);
             _context.SaveChanges();
         }
-
         private static void InsertVariousTypes()
         {
             var samurai = new Samurai { Name = "Kikuchio" };
@@ -43,14 +51,12 @@ namespace ConsoleApp
             _context.AddRange(samurai, clan);
             _context.SaveChanges();
         }
-
         private static void AddSamurai()
         {
             var samurai = new Samurai { Name = "Sampson" };
             _context.Samurais.Add(samurai);
             _context.SaveChanges();
         }
-
         private static void GetSamuraisUsingLINQMethods()
         {
             //var samuraisLINQMethod = context.Samurais.ToList();
@@ -63,7 +69,6 @@ namespace ConsoleApp
             }
             //Console.WriteLine(samuraisLINQMethod2);
         }
-
         private static void GetSamuraisUsingLINQQuerySyntax()
         {
             var samuraisLINQQuery1 = from s in _context.Samurais
@@ -74,12 +79,10 @@ namespace ConsoleApp
                                      select s;
             samuraisLINQQuery2.ToList();
         }
-
         private static void GetSamuraiSimpler()
         {
             var samurais = _context.Samurais.ToList();
         }
-
         private static void GetSamurais(string text)
         {
             var samurais = _context.Samurais.ToList();
@@ -89,7 +92,6 @@ namespace ConsoleApp
                 Console.WriteLine($"{samurai.Id}: {samurai.Name}");
             }
         }
-
         private static void QueryFilters()
         {
             var name = "Sampson";
@@ -98,17 +100,48 @@ namespace ConsoleApp
             //var samurais = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "Re%"));
             var samurais = _context.Samurais.OrderBy(s => s.Id).LastOrDefault(s => s.Name == name);
         }
-
         private static void RetrieveAndUpdateSamurai()
         {
-            //var samurai = _context.Samurais.FirstOrDefault(s => s.Name == "Remik");
-            //samurai.Name += "San";
-            var samuraiRemik = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%Remik%")).ToList();
+            var samurai = _context.Samurais.FirstOrDefault(s => s.Name == "Remik");
+            samurai.Name += "San";
+            /*var samuraiRemik = _context.Samurais.Where(s => EF.Functions.Like(s.Name, "%Remik%")).ToList();
             foreach (var samurai in samuraiRemik)
             {
                 Console.WriteLine(samurai.Name);
+            }*/
+            _context.SaveChanges();
+        }
+        private static void RetrieveAndUpdateMultipleSamurais()
+        {
+            var samurais = _context.Samurais.Skip(4).Take(4).ToList();
+            samurais.ForEach(s => s.Name += "San");
+            _context.SaveChanges();
+        }
+        private static void RemoveSamurai()
+        {
+            var samurai = _context.Samurais.Find(18);
+            _context.Samurais.Remove(samurai);
+            _context.SaveChanges();
+        }
+        private static void InsertBattle()
+        {
+            _context.Battles.Add(new Battle
+            {
+                Name = "Battle of Okehazama",
+                StartDate = new DateTime(1560, 05, 01),
+                EndDate = new DateTime(1560, 06, 15)
+            });
+            _context.SaveChanges();
+        }
+        private static void QueryAndUpdateBattle_Disconnected()
+        {
+            var battle = _context.Battles.AsNoTracking().FirstOrDefault();
+            battle.EndDate = new DateTime(1560, 06, 30);
+            using (var newContextInstance = new SamuraiContext())
+            {
+                newContextInstance.Battles.Update(battle);
+                newContextInstance.SaveChanges();
             }
-            //_context.SaveChanges();
         }
     }
 }
