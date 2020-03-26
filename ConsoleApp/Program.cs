@@ -33,6 +33,8 @@ namespace ConsoleApp
             //AddQuoteToExistingSamuraiWhileTracked();
             //AddQuoteToExistingSamuraiNotTracked(1);
             //AddQuoteToExistingSamuraiNotTracked_Easy(5);
+            EagerLoadSamuraiWithQuotes();
+            //RetrieveAndUpdateMultipleSamurais();
             Console.Write("Press any key...");
             Console.ReadKey();
 
@@ -119,7 +121,7 @@ namespace ConsoleApp
         }
         private static void RetrieveAndUpdateMultipleSamurais()
         {
-            var samurais = _context.Samurais.Skip(4).Take(4).ToList();
+            var samurais = _context.Samurais.Skip(1).Take(3).ToList();
             samurais.ForEach(s => s.Name += "San");
             _context.SaveChanges();
         }
@@ -217,6 +219,14 @@ namespace ConsoleApp
             {
                 newContext.Quotes.Add(quote);
                 newContext.SaveChanges();
+            }
+        }
+        private static void EagerLoadSamuraiWithQuotes()
+        {
+            var samuraiWithQuotes = _context.Samurais.Include(s => s.Battles).ToList();
+            foreach (var samurai in samuraiWithQuotes)
+            {
+                Console.WriteLine(samurai.Name);
             }
         }
     }
