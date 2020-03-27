@@ -37,7 +37,10 @@ namespace ConsoleApp
             //RetrieveAndUpdateMultipleSamurais();
             //ProjectSomeProperties();
             //ProjectSamuraisWithQuotes();
-            ExplicitLoadQuotes();
+            //ExplicitLoadQuotes();
+            //FilteringWithRelatedData();
+            //ModifyingRelatedDataWhenTracked();
+            ModifyingRelatedDataWhenNotTracked();
             Console.Write("Press any key...");
             Console.ReadKey();
 
@@ -227,6 +230,13 @@ namespace ConsoleApp
         private static void EagerLoadSamuraiWithQuotes()
         {
             var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+            var samuraiWithAnyQuotes = _context.Samurais
+                .Select(s => new
+                {
+                    Samurai = s,
+                    Quotes = s.Quotes.Where(q => q.Text.Contains(" "))
+                })
+                .ToList();
         }
         private static void ProjectSomeProperties()
         {
@@ -251,13 +261,14 @@ namespace ConsoleApp
                 })
                 .ToList();*/
             var samuraiWithHappyQuotes = _context.Samurais
+                .OrderBy(s => s.Quotes.Count())
                 .Select(s => new
                 {
                     Samurai = s,
                     HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy"))
                 })
                 .ToList();
-            var firstSamurai = samuraiWithHappyQuotes[0].Samurai.Name += " The Happies";
+            //var firstSamurai = samuraiWithHappyQuotes[0].Samurai.Name += " The Happies";
         }
 
         private static void ExplicitLoadQuotes()
@@ -271,8 +282,27 @@ namespace ConsoleApp
         private static void FilteringWithRelatedData()
         {
             var samurais = _context.Samurais
-                                   .Where(s => s.Quotes.Any(q => q.Text.Contains("happy")))
+                                   .Where(s => s.Quotes.Any(q => q.Text.Contains("Happy")))
                                    .ToList();
+        }
+        private static void ModifyingRelatedDataWhenTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 24);
+            samurai.Quotes[0].Text = " Did you hear that?";
+            samurai.Quotes.Remove(samurai.Quotes[1]);
+            _context.SaveChanges();
+        }
+        private static void ModifyingRelatedDataWhenNotTracked()
+        {
+            var samurai = _context.Samurais.Include(s => s.Quotes).FirstOrDefault(s => s.Id == 24);
+            var quote = samurai.Quotes[0];
+            quote.Text += " Did you hear that again?";
+            using (var newContext = new SamuraiContext())
+            {
+                //newContext.Update(quote);
+                newContext.Entry(quote).State = EntityState.Modified;
+                newContext.SaveChanges();
+            }
         }
     }
 }
