@@ -33,8 +33,11 @@ namespace ConsoleApp
             //AddQuoteToExistingSamuraiWhileTracked();
             //AddQuoteToExistingSamuraiNotTracked(1);
             //AddQuoteToExistingSamuraiNotTracked_Easy(5);
-            EagerLoadSamuraiWithQuotes();
+            //EagerLoadSamuraiWithQuotes();
             //RetrieveAndUpdateMultipleSamurais();
+            //ProjectSomeProperties();
+            //ProjectSamuraisWithQuotes();
+            ExplicitLoadQuotes();
             Console.Write("Press any key...");
             Console.ReadKey();
 
@@ -223,11 +226,53 @@ namespace ConsoleApp
         }
         private static void EagerLoadSamuraiWithQuotes()
         {
-            var samuraiWithQuotes = _context.Samurais.Include(s => s.Battles).ToList();
-            foreach (var samurai in samuraiWithQuotes)
+            var samuraiWithQuotes = _context.Samurais.Include(s => s.Quotes).ToList();
+        }
+        private static void ProjectSomeProperties()
+        {
+            var someProperties = _context.Samurais.Select(s => new { s.Id, s.Name }).ToList();
+            var idsAndNames = _context.Samurais.Select(s => new IdAndName(s.Id, s.Name)).ToList();
+        }
+        public struct IdAndName
+        {
+            public IdAndName(int id, string name)
             {
-                Console.WriteLine(samurai.Name);
+                Id = id;
+                Name = name;
             }
+            public int Id;
+            public string Name;
+        }
+        private static void ProjectSamuraisWithQuotes()
+        {
+            /*var somePropertiesWithQuotes = _context.Samurais
+                .Select(s => new { s.Id, s.Name, 
+                    HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy")) 
+                })
+                .ToList();*/
+            var samuraiWithHappyQuotes = _context.Samurais
+                .Select(s => new
+                {
+                    Samurai = s,
+                    HappyQuotes = s.Quotes.Where(q => q.Text.Contains("happy"))
+                })
+                .ToList();
+            var firstSamurai = samuraiWithHappyQuotes[0].Samurai.Name += " The Happies";
+        }
+
+        private static void ExplicitLoadQuotes()
+        {
+            var samurai = _context.Samurais.FirstOrDefault(s => s.Name.Contains("Remik"));
+            //for collection, where's a data
+            _context.Entry(samurai).Collection(s => s.Quotes).Load();
+            //for reference, there's no data yet in database
+            _context.Entry(samurai).Reference(s => s.Horse).Load();
+        }
+        private static void FilteringWithRelatedData()
+        {
+            var samurais = _context.Samurais
+                                   .Where(s => s.Quotes.Any(q => q.Text.Contains("happy")))
+                                   .ToList();
         }
     }
 }
