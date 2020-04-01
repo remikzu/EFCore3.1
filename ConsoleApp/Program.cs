@@ -47,8 +47,10 @@ namespace ConsoleApp
             //JoinBattleAndSamurai();
             //GetSamuraiWithBattles();
             //AddNewSamuraiWithHorse();
-            
-
+            //AddNewHorseToSamuraiUsingId();
+            //AddNewHorseToSamuraiObject();
+            //AddNewHorseToDisconnectedSamuraiObject();
+            ReplaceAHorse();
             Console.Write("Press any key...");
             Console.ReadKey();
 
@@ -364,7 +366,7 @@ namespace ConsoleApp
 
         private static void AddNewHorseToSamuraiObject()
         {
-            var samurai = _context.Samurais.Find(22);
+            var samurai = _context.Samurais.Find(4);
             samurai.Horse = new Horse { Name = "Black Beauty" };
             _context.SaveChanges();
         }
@@ -377,6 +379,12 @@ namespace ConsoleApp
                 newContext.Attach(samurai);
                 newContext.SaveChanges();
             }
+        }
+        private static void ReplaceAHorse()
+        {
+            var samurai = _context.Samurais.Include(s => s.Horse).FirstOrDefault(s => s.Id == 3);
+            samurai.Horse = new Horse { Name = "Trigger" };
+            _context.SaveChanges();
         }
     }
 }
