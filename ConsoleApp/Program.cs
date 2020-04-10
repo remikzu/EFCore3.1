@@ -386,5 +386,15 @@ namespace ConsoleApp
             samurai.Horse = new Horse { Name = "Trigger" };
             _context.SaveChanges();
         }
+        private static void GetSamuraiWithClan()
+        {
+            var samurai = _context.Samurais.Include(s => s.Clan).FirstOrDefault();
+        }
+        private static void GetClanWithSamurais()
+        {
+            //var clan = _context.Clans.Include(c => c.???)
+            var clan = _context.Clans.Find(3);
+            var samuraisForClan = _context.Samurais.Where(s => s.Clan.Id == 3).ToList();
+        }
     }
 }
