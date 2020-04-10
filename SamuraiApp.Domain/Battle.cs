@@ -6,6 +6,10 @@ namespace SamuraiApp.Domain
 {
     public class Battle
     {
+        public Battle()
+        {
+            SamuraiBattles = new List<SamuraiBattle>();
+        }
 
         public int BattleId { get; set; }
         public string Name { get; set; }

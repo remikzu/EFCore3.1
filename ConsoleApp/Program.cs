@@ -50,7 +50,7 @@ namespace ConsoleApp
             //AddNewHorseToSamuraiUsingId();
             //AddNewHorseToSamuraiObject();
             //AddNewHorseToDisconnectedSamuraiObject();
-            ReplaceAHorse();
+            //ReplaceAHorse();
             Console.Write("Press any key...");
             Console.ReadKey();
 
